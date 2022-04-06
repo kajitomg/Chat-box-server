@@ -11,7 +11,38 @@ router.post('/send-message',
 		try {
 			const { message, userid, roomid } = req.body;
 			const user = await User.findOne({ _id: userid })
-			const newMessage = new Message({ user_id: user, username: user.username, mess: message, room_id: roomid })
+			const date = new Date()
+			let month = date.getMonth().toString()
+			let day = date.getDate().toString()
+			let hours = date.getHours().toString()
+			let minutes = date.getMinutes().toString()
+			let seconds = date.getSeconds().toString()
+			if ((date.getMonth() + 1) < 10) {
+				month = `0${date.getMonth() + 1}`
+			}
+			if (date.getDate() < 10) {
+				day = `0${date.getDate()}`
+			}
+			if (date.getHours() < 10) {
+				hours = `0${date.getHours()}`
+			}
+			if (date.getMinutes() < 10) {
+				minutes = `0${date.getMinutes()}`
+			}
+			if (date.getSeconds() < 10) {
+				seconds = `0${date.getSeconds()}`
+			}
+			const dateObj = {
+				year: date.getFullYear().toString(),
+				month: month,
+				day: day,
+				hours: hours,
+				minutes: minutes,
+				seconds: seconds
+			}
+			console.log(dateObj)
+			const time = (dateObj.hours + ':' + dateObj.minutes).toString()
+			const newMessage = new Message({ user_id: user, date: dateObj, time: time, username: user.username, mess: message, room_id: roomid })
 			await newMessage.save()
 			let updatedRoom = await chatRoom.findOne({ _id: roomid })
 			updatedRoom = await chatRoom.findOneAndUpdate({ _id: roomid }, { messages: [...updatedRoom.messages, newMessage] })
